@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import io
 
 # --- Plot function ---
 def plot_budget_vs_regnskab(df: pd.DataFrame, title="Budget vs. Regnskab (med 2024 som reference)") -> plt.Figure:
@@ -55,14 +56,42 @@ def plot_budget_vs_regnskab(df: pd.DataFrame, title="Budget vs. Regnskab (med 20
 
 # --- Streamlit App ---
 st.title("📊 Budget vs. Regnskab Dashboard")
+
+st.markdown("""
+Denne graf viser forskellen mellem budgetterede og faktiske timer for hver måned.
+
+- **Grøn skygge** = mere end budget (besparelse)
+- **Rød skygge** = mindre end budget (overskridelse)
+- **Sort stiplede linje** = regnskab fra sidste år
+""")
+
 uploaded_file = st.file_uploader("Upload Excel-fil", type=["xlsx"])
 
+@st.cache_data
+def load_excel(file):
+    return pd.read_excel(file)
+
 if uploaded_file is not None:
-    df = pd.read_excel(uploaded_file)
-    if all(col in df.columns for col in ["Budget", "Regnskab", "Regnskab t-1"]):
-        fig = plot_budget_vs_regnskab(df)
-        st.pyplot(fig)
-    else:
-        st.error("Excel-filen mangler nødvendige kolonner: 'Budget', 'Regnskab', 'Regnskab t-1'")
+    try:
+        df = load_excel(uploaded_file)
+        required_cols = ["Budget", "Regnskab", "Regnskab t-1"]
+        if all(col in df.columns for col in required_cols):
+            fig = plot_budget_vs_regnskab(df)
+            st.pyplot(fig)
+
+            # Export download
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png")
+            st.download_button(
+                "📥 Download graf som billede",
+                data=buf.getvalue(),
+                file_name="budget_vs_regnskab.png",
+                mime="image/png"
+            )
+        else:
+            missing = [col for col in required_cols if col not in df.columns]
+            st.error(f"Excel-filen mangler kolonner: {', '.join(missing)}")
+    except Exception as e:
+        st.error(f"Fejl ved indlæsning af Excel-fil: {e}")
 else:
     st.info("Vent på, at du uploader en Excel-fil med relevante data.")
