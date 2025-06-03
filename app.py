@@ -60,9 +60,9 @@ st.title("📊 Budget vs. Regnskab Dashboard")
 st.markdown("""
 Denne graf viser forskellen mellem budgetterede og faktiske timer for hver måned.
 
-- **Grøn skygge** = mere end budget (besparelse)
-- **Rød skygge** = mindre end budget (overskridelse)
-- **Sort stiplede linje** = regnskab fra sidste år
+- **Grøn skygge** = Flere timer registreret end budgetteret
+- **Rød skygge** = Færre timer registreret end budgetteret
+- **Sort stiplede linje** = Registrerede timer sidste år, korrigeret efter årsværk
 """)
 
 uploaded_file = st.file_uploader("Upload Excel-fil", type=["xlsx"])
