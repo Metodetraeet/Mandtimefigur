@@ -46,7 +46,6 @@ def plot_budget_vs_regnskab(df: pd.DataFrame, title="Budget vs. Regnskab (med 20
     ax.set_xticks(x)
     ax.set_xticklabels(måneder, rotation=45)
     ax.set_title(title)
-    ax.set_xlabel("Måned")
     ax.set_ylabel("Timer")
     ax.grid(True)
     ax.legend()
